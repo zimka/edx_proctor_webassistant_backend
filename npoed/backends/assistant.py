@@ -13,6 +13,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from edx_proctoring.backends.backend import ProctoringBackendProvider
 from edx_proctoring import constants
@@ -32,6 +33,7 @@ from edx_proctoring.models import (
 
 log = logging.getLogger(__name__)
 
+User = get_user_model()
 
 class NPOEDBackendProvider(ProctoringBackendProvider):
     """

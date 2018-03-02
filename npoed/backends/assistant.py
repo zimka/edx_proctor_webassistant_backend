@@ -79,16 +79,24 @@ class NPOEDBackendProvider(ProctoringBackendProvider):
         status, response = self._send_request_to_ssi(data, signature, http_date)
 
         if status not in [200, 201]:
+            response_message = None
+            if status == 403:
+                try:
+                    response_dict = json.loads(response)
+                    response = response_dict.get('error')
+                    response_message = response_dict.get('message')
+                except ValueError:
+                    pass
             err_msg = (
                 u'Could not register attempt_code = {attempt_code}. '
-                'HTTP Status code was {status_code} and response was {response}.'.format(
+                'HTTP Status code was {status_code} and response was "{response}".'.format(
                     attempt_code=attempt_code,
                     status_code=status,
                     response=response
                 )
             )
             log.error(err_msg)
-            raise BackendProvideCannotRegisterAttempt(err_msg)
+            raise BackendProvideCannotRegisterAttempt(err_msg, response_message)
 
         # get the external ID that Proctor webassistant has defined
         # for this attempt
